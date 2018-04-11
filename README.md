@@ -16,5 +16,3 @@ Very few people want to consider it at that level.
  - Someone training a **Char-RNN** might want to consider **Corpus made up of Characters**.
 
  This package lets you better work with iterators of iterators to allow them to be flattened and viewed at different levels.
-
- 
