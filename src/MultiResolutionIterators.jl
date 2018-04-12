@@ -24,24 +24,31 @@ function apply_at_level(f, iter, lvls)
     end
 
     # scalar, any children (Fall back if didn't manage to stop earlier)
-    function inner(::Scalar,::Any, level_iter, cur_level)
-        level_iter # THis is just a scalare element
+    function inner(::Scalar,::Any, childs, cur_level)
+        childs # THis is just a scalare element
     end
 
     # not scalar, children scalar
-    function inner(::NotScalar,::Scalar, level_iter, cur_level)
+    function inner(::NotScalar,::Scalar, childs, cur_level)
         # Only ops we care about are ones that act on nonscalar children
-        level_iter
+        childs
     end
 
     # not scalar, children not scalar (probably)
-    function inner(::NotScalar, ::NotScalar, level_iter, cur_level)
-        childs = (inner(it, cur_level+1) for it in level_iter)
-        if cur_level ∈ lvls
-            f(childs)
-        else
-            childs
+    function inner(::NotScalar, ::NotScalar, childs, cur_level)
+
+        #TODO Workout why this needs to be <=, and not just <
+        if cur_level <= maximum(lvls)
+            # Only expand down if not yet at deepset level we act on
+            # (This saves on allocations and time
+            childs = (inner(child, cur_level+1) for child in childs)
         end
+
+        if cur_level ∈ lvls
+            # If on the level where we act, then act
+            childs = f(childs)
+        end
+        childs
     end
 
     inner(iter, 1)
