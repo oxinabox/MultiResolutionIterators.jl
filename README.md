@@ -18,7 +18,22 @@ Very few people want to consider it at that level.
  This package lets you better work with iterators of iterators to allow them to be flattened and viewed at different levels.
 
 
- ## Usage
+## Operations
+
+### `merge_levels`
+
+This is the levelled version of flatten.
+`merge(iter, 1)` is the same as `Base.Iterators.flatten(iter)`.
+`merge(iter, 2)` is the same as `Base.Iterators.flatten.(iter)` (assuming iter is Vector or similar)
+`merge(iter, 1:2)` is the same as `Base.Iterators.flatten(Base.Iterators.flatten.(iter))`
+`merge(iter, ALL_LEVELS)` results in a fully flat output.
+
+### `collect_levels`
+This converts the given levels from iterators to `Vector`s.
+The most useful is likely `collect(iter, ALL_LEVELS)` which we export under the alias `full_collect`.
+
+
+## Usage
 
  A simple example we have a corpus, made of documents (on about turtles and one about cats).
  The documents are made up of sentences, which are made up of words, which are made up of characters.
