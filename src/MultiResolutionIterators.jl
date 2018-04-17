@@ -1,6 +1,6 @@
 module MultiResolutionIterators
 export ALL_LEVELS, lvls,
-    full_collect, merge_levels, collect_levels
+    full_collect, merge_levels, collect_levels, join_levels
 
 include("core.jl")
 include("namedlevels.jl")

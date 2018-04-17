@@ -180,3 +180,7 @@ julia> # i.e. merge documents
  String["Cats", "are", "mammals", "."]
  String["They", "live", "on", "the", "internet"]
 ```
+
+## See also
+
+ - [AbstractTrees.jl](https://github.com/Keno/AbstractTrees.jl): An iterator of iterators of ... etc duck-types as an `AbstractTree` and will work with AbstractTrees.jl

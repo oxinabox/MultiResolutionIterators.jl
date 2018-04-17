@@ -2,21 +2,38 @@ using MultiResolutionIterators
 using Base.Test
 using Base.Iterators
 
+
 @testset "basic 1" begin
     eg =   [["aaaa", "bbbb", "ccc"], ["AAA", "BB", "CCC", "DDDDD"], ["111","222"]]
 
-    @test full_collect(eg) == eg
 
-    @test full_collect(merge_levels(eg, 1)) ==
-        full_collect(["aaaa", "bbbb", "ccc","AAA", "BB", "CCC", "DDDDD", "111","222"]) ==
-        ["aaaa", "bbbb", "ccc","AAA", "BB", "CCC", "DDDDD", "111","222"]
 
-    @test full_collect(merge_levels(eg, 2)) == collect.(["aaaabbbbccc","AAABBCCCDDDDD","111222"])
+    @testset "join" begin
+        @test full_collect(join_levels(eg, Dict(2=>" "))) ==
+            full_collect(["aaaa bbbb ccc","AAA BB CCC DDDDD","111 222"])
 
-    @test full_collect(merge_levels(eg, 1:2)) ==
-        collect(merge_levels(eg, 1:2)) ==
-        full_collect(merge_levels(eg, ALL_LEVELS))
-        collect("aaaabbbbcccAAABBCCCDDDDD111222")
+        @test full_collect(join_levels(eg, Dict(1=>"+", 2=>" "))) ==
+            full_collect("aaaa bbbb ccc+AAA BB CCC DDDDD+111 222")
+    end
+
+
+    @testset "collect" begin
+        @test full_collect(eg) == eg
+    end
+
+    @testset "merge_levels (flatten)" begin
+        @test full_collect(merge_levels(eg, 1)) ==
+            full_collect(["aaaa", "bbbb", "ccc","AAA", "BB", "CCC", "DDDDD", "111","222"]) ==
+            ["aaaa", "bbbb", "ccc","AAA", "BB", "CCC", "DDDDD", "111","222"]
+
+        @test full_collect(merge_levels(eg, 2)) == collect.(["aaaabbbbccc","AAABBCCCDDDDD","111222"])
+
+        @test full_collect(merge_levels(eg, 1:2)) ==
+            collect(merge_levels(eg, 1:2)) ==
+            full_collect(merge_levels(eg, ALL_LEVELS))
+            collect("aaaabbbbcccAAABBCCCDDDDD111222")
+
+    end
 end
 
 
