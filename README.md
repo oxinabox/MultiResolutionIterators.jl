@@ -32,11 +32,19 @@ This is the levelled version of flatten.
 This converts the given levels from iterators to `Vector`s.
 The most useful is likely `collect(iter, ALL_LEVELS)` which we export under the alias `full_collect`.
 
+### `join_levels`
+This is a generalization of `join(strings, delim)`
+Pass in a dictionary from levels to the character to be used to join that level.
+
 
 ## Usage
 
- A simple example we have a corpus, made of documents (on about turtles and one about cats).
- The documents are made up of sentences, which are made up of words, which are made up of characters.
+A simple example we have a corpus, made of documents (on about turtles and one about cats).
+The documents are made up of sentences, which are made up of words, which are made up of characters.
+
+The basic usage is to specify levels to act on by directly specifing the number.
+The more advances usage is to declare an **indexer**, then refer to the levels by **name**.
+
 
 ### Basic usage
 
@@ -87,7 +95,7 @@ julia> # Get rid of document and sentence boundaries
  "the"
  "internet"
 
-julia> # Git rid of all boundaries, just a stream of characters
+julia> # Get rid of all boundaries, just a stream of characters
        merge_levels(animal_info, ALL_LEVELS) |> full_collect
 88-element Array{Char,1}:
  'T'
@@ -105,7 +113,7 @@ julia> # Git rid of all boundaries, just a stream of characters
  'e'
  't'
 
-julia> # Git rid of word boundaries so each document is a a stream of characters
+julia> # Get rid of word boundaries so each document is a a stream of characters
        merge_levels(animal_info, [1,3]) |> full_collect
 5-element Array{Array{Char,1},1}:
  ['T', 'u', 'r', 't', 'l', 'e', 's', 'a', 'r', 'e', 'r', 'e', 'p', 't', 'i', 'l', 'e', 's', '.']
@@ -113,6 +121,13 @@ julia> # Git rid of word boundaries so each document is a a stream of characters
  ['T', 'h', 'e', 'y', 'l', 'i', 'v', 'e', 'i', 'n', 't', 'h', 'e', 'w', 'a', 't', 'e', 'r']
  ['C', 'a', 't', 's', 'a', 'r', 'e', 'm', 'a', 'm', 'm', 'e', 'l', 's', '.']
  ['T', 'h', 'e', 'y', 'l', 'i', 'v', 'e', 'o', 'n'  …  'h', 'e', 'i', 'n', 't', 'e', 'r', 'n', 'e', 't']
+
+julia> # Join all words using spaces, keep other structure
+        join_levels(animal_info, Dict(3=>" ")) |> full_collect
+2-element Array{Array{String,1},1}:
+ String["Turtles are reptiles .", "They have shells .", "They live in the water"]
+ String["Cats are mammals .", "They live on the internet"]
+
 ```
 
 
@@ -179,6 +194,17 @@ julia> # i.e. merge documents
  String["They", "live", "in", "the", "water"]
  String["Cats", "are", "mammals", "."]
  String["They", "live", "on", "the", "internet"]
+
+
+julia> # Join all words using spaces, join all sentences with new lines, all documents with double new lines
+       join_levels(animal_info, lvls(indexer,Dict(:words=>" ", :sentences=>"\n", :documents=>"\n---\n"))) |> full_collect |> print
+
+Turtles are reptiles .
+They have shells .
+They live in the water
+---
+Cats are mammals .
+They live on the internet
 ```
 
 ## See also

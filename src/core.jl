@@ -10,12 +10,20 @@ isscalar(::Type{Char}) = Scalar() # We consider Sharacter to be scalar
 isscalar(::Type{T}) where T = method_exists(start, (T,)) ? NotScalar() : Scalar()
 
 
-"""
-    apply_at_level(f, iter, lvls)
 
-Apply a given function `f` at the `lvl`'s specified
+
 """
-function apply_at_level(f, iter, lvls)
+    apply_to_interior_levels(f, iter, lvls)
+
+f is called on all levels up to `max_depth`
+that have children and who's children (probably) have children.
+
+
+`f` must be a function taking the current level number it's first argument,
+and the level content as it's second.
+That level is replaced with the return value of `f`
+"""
+function apply_to_interior_levels(ff, iter, lvls, max_depth)
     function inner(level_iter::T, cur_level) where T
         # This is a static Holy Trait dispatch
         this_scalar = isscalar(T)
@@ -25,7 +33,7 @@ function apply_at_level(f, iter, lvls)
 
     # scalar, any children (Fall back if didn't manage to stop earlier)
     function inner(::Scalar,::Any, childs, cur_level)
-        childs # THis is just a scalare element
+        childs # This is just a scalare element
     end
 
     # not scalar, children scalar
@@ -37,51 +45,54 @@ function apply_at_level(f, iter, lvls)
     # not scalar, children not scalar (probably)
     function inner(::NotScalar, ::NotScalar, childs, cur_level)
         #TODO Workout why this needs to be <=, and not just <
-        if cur_level <= maximum(lvls)
+        if cur_level <= max_depth
             # Only expand down if not yet at deepset level we act on
             # (This saves on allocations and time
             childs = (inner(child, cur_level+1) for child in childs)
         end
 
-        if cur_level ∈ lvls
-            # If on the level where we act, then act
-            childs = f(childs)
-        end
-        childs
+        ff(cur_level, childs)
     end
 
     inner(iter, 1)
 end
 
+"""
+    apply_at_level(ff, iter, lvls)
+
+Apply the given function `ff` at all levels specified in `lvls`
+"""
+function apply_at_level(ff, iter, lvls)
+    max_depth = maximum(lvls)
+    apply_to_interior_levels(iter, lvls, max_depth) do cur_level, childs
+        if cur_level ∈ lvls
+            # If on the level where we act, then act
+            ff(childs)
+        else
+            childs
+        end
+    end
+end
 
 
 """
-    apply_per_level(iter, lvls, ops)
+    apply_at_level(iter, lvl_ops::Associative{<:Integer})
 
+Applies a op
 `ops` is a list of functions the same length as `lvls`.
 `apply_pel_level` applies the given op, at the correponding level.
 
 If only a single level and a single op is provider,
 then this is identical to `apply_at_level`.
 """
-function apply_per_level(iter, lvls, ops)
-    lvls = collect(lvls)
-    ops = collect(ops)
-    @assert length(lvls) == length(ops)
-    order = sortperm(lvls, rev=true)
-    lvls = lvls[order]
-    ops=ops[order]
-
-    ret = iter
-    for (lvl, op) in zip(lvls, ops)
-        ret = MultiResolutionIterators.apply_at_level(op, ret, lvl)
+function apply_at_level(iter, lvl_ops::Associative{<:Integer})
+    max_depth = maximum(keys(lvl_ops))
+    apply_to_interior_levels(iter, lvl_ops, max_depth) do cur_level, childs
+        # if level is a key then  do the thing, else no change
+        if haskey(lvl_ops, cur_level)
+            lvl_ops[cur_level](childs)
+        else
+            childs
+        end
     end
-    ret
 end
-
-"""
-     apply_per_level(iter, lvl_ops::Associative)
-
-for lvl_ops being some
-"""
-apply_per_level(iter, lvl_ops::Associative) = apply_per_levels(iter, zip(lvl_ops...)...)

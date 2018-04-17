@@ -16,37 +16,40 @@ Multiple names can be given to the name nmbered level (Many to One)
 """
 function levelname_map end
 
+# include the levels
+lvls(indexer) = Int[]
+lvls(indexer, nums::Vararg{<:Integer}) = nums
+function lvls(indexer, names::Vararg{Symbol})
+    name_set = first.(levelname_map(indexer))
+    num_set = last.(levelname_map(indexer))
+    map(names) do name
+        ind = findfirst(name_set, name)
+        num_set[ind]
+    end
+end
 
-exclude_levels(indexer) = unique(last.(levelname_map(indexer)))
+function lvls(indexer, named_level_ops::Dict)
+    nums = lvls(indexer, keys(named_level_ops)...)
+    Dict(zip(nums, values(named_level_ops)))
+end
 
-function exclude_levels(indexer, nums::Vararg{<:Integer})
-    all_levels = exclude_levels(indexer)
+
+################
+# exclude3 the levels using `(!lvls)(args...)`
+
+not_lvls(indexer) = unique(last.(levelname_map(indexer)))
+
+function not_lvls(indexer, nums::Vararg{<:Integer})
+    all_levels = (!lvls)(indexer)
     setdiff(all_levels, nums)
     # all the levels, except the ones we are excluding
 end
 
-function exclude_levels(indexer, names::Vararg{Symbol})
-    exclude_levels(indexer, include_levels(indexer, names...)...)
+function not_lvls(indexer, names::Vararg{Symbol})
+    (!lvls)(indexer, lvls(indexer, names...)...)
 end
 
-include_levels(indexer) = Int[]
-
-include_levels(indexer, nums::Vararg{<:Integer}) = nums
-
-function include_levels(indexer, names::Vararg{Symbol})
-    inds = findin(first.(levelname_map(indexer)), names)
-    level_nums = last.(levelname_map(indexer)[inds])
-    include_levels(indexer, level_nums...)
-end
-
-############################################
-#=               API                      =#
-
-lvls(indexer, args...) = include_levels(indexer, args...)
-
-Base.:!(::typeof(lvls)) = (indexer, args...) -> exclude_levels(indexer, args...)
-
-
-
+# make `(!lvls)`  the same as `not_lvls`
+(Base.:!(::typeof(lvls))) = not_lvls
 
 #

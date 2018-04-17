@@ -49,5 +49,5 @@ But if they are not, e.g. they were nonmerged layers then this often going to be
 But what exactly did you expect it to do? (Answer? Throw an error)
 """
 function join_levels(iter, lvl_delims::Associative)
-    apply_per_level(iter, Dict(lvl => (xs->join(xs,delim))  for (lvl,delim) in lvl_delims))
+    apply_at_level(iter, Dict(lvl => (xs->join(xs,delim))  for (lvl,delim) in lvl_delims))
 end

@@ -17,11 +17,15 @@ merge_levels(animal_info, 2) |> full_collect
 # Get rid of document and sentence boundries
 merge_levels(animal_info, 1:2) |> full_collect
 
-# Git rid of all boundaries, just a stream of characters
+# Get rid of all boundaries, just a stream of characters
 merge_levels(animal_info, ALL_LEVELS) |> full_collect
 
-# Git rid of word boundaries so each document is a a stream of characters
+# Get rid of word boundaries so each document is a a stream of characters
 merge_levels(animal_info, [1,3]) |> full_collect
+
+# Join all words using spaces, keep other structure
+join_levels(animal_info, Dict(3=>" ")) |> full_collect
+
 
 ### Using Named levels
 
@@ -43,8 +47,13 @@ merge_levels(animal_info, lvls(indexer, :sentences)) |> full_collect
 # Merge everything **except** words
 merge_levels(animal_info, (!lvls)(indexer, :words)) |> full_collect
 
-# Merge everything **except** words and sentences
-merge_levels(animal_info, (!lvls)(indexer, :words, :sentences)) |> full_collect
+# Merge everything **except** words and sentences merge_levels(animal_info, (!lvls)(indexer, :words, :sentences)) |> full_collect
 
 # i.e. merge documents
 merge_levels(animal_info, lvls(indexer, :documents)) |> full_collect
+
+
+# # Join all words using spaces, join all sentences with new lines, all documents with double new lines
+join_levels(animal_info,
+ lvls(indexer,Dict(:words=>" ", :sentences=>"\n", :documents=>"\n---\n"))) |>
+ full_collect |> print
