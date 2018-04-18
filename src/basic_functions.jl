@@ -56,13 +56,12 @@ MultiResolutionIterators.consolidate(xs::MyType) == MyType(consolidate(xs.conten
 ```
 It is useful if there are other fields in your type that you want to preserve,
 """
-consolidate(str::String) = str
+consolidate(str::AbstractString) = str
 
 function consolidate(xs::T) where T
     ret =  collect(xs)
     if eltype(T)==Char || eltype(typeof(ret))==Char # In theory `collect` is type stable
-
-         return String(ret)
+         return String(ret) # A string is no worse (and normally better) than an array of Chars
     end
     return ret
 end
