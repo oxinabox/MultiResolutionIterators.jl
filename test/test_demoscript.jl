@@ -44,13 +44,19 @@ indexer = AnimalTextIndexer();
 # Merge all sentences
 merge_levels(animal_info, lvls(indexer, :sentences)) |> full_consolidate
 
+# I.e keep documents, and words
+merge_levels(animal_info, (!lvls)(indexer, :words, :documents)) |> full_consolidate
+
+
 # Merge everything **except** words
 merge_levels(animal_info, (!lvls)(indexer, :words)) |> full_consolidate
 
-# Merge everything **except** words and sentences merge_levels(animal_info, (!lvls)(indexer, :words, :sentences)) |> full_consolidate
+# Merge everything **except** words and sentences
+merge_levels(animal_info, (!lvls)(indexer, :words, :sentences)) |> full_consolidate
 
 # i.e. merge documents
 merge_levels(animal_info, lvls(indexer, :documents)) |> full_consolidate
+
 
 
 # # Join all words using spaces, join all sentences with new lines, all documents with double new lines

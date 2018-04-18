@@ -67,12 +67,14 @@ Apply the given function `ff` at all levels specified in `lvls`
 function apply_at_level(ff, iter, lvls)
     max_depth = maximum(lvls)
     apply_to_interior_levels(iter, lvls, max_depth) do cur_level, childs
-        if cur_level ∈ lvls
+        ret = if cur_level ∈ lvls
             # If on the level where we act, then act
             ff(childs)
         else
             childs
         end
+        @show (cur_level, typeof(ret))
+        ret
     end
 end
 
