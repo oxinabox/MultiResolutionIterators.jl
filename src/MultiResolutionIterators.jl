@@ -1,4 +1,5 @@
 module MultiResolutionIterators
+using IterTools: imap
 export ALL_LEVELS, lvls,
     full_collect, merge_levels, collect_levels, join_levels
 
