@@ -20,6 +20,17 @@ Very few people want to consider it at that level.
 
 ## Operations
 
+### `consolidate`
+This is a variation on `collect`.
+It only promises the returned result will be indexable,
+not that it will be a `Vector`.
+It is provided to be overloaded.
+
+### `consolidate_levels`
+This converts the given levels from iterators to `Vector`s.
+The most useful is likely `consolidate(iter, ALL_LEVELS)` which we export under the alias `full_consolidate`.
+
+
 ### `merge_levels`
 
 This is the levelled version of flatten.
@@ -28,14 +39,24 @@ This is the levelled version of flatten.
 `merge(iter, 1:2)` is the same as `Base.Iterators.flatten(Base.Iterators.flatten.(iter))`
 `merge(iter, ALL_LEVELS)` results in a fully flat output.
 
-### `collect_levels`
-This converts the given levels from iterators to `Vector`s.
-The most useful is likely `collect(iter, ALL_LEVELS)` which we export under the alias `full_collect`.
 
 ### `join_levels`
 This is a generalization of `join(strings, delim)`
 Pass in a dictionary from levels to the character to be used to join that level.
 
+
+## Customizing Behavior
+MultiResolutionIterators will by default destroy all types at all levels it touches,
+because it needs to replace their iterators with new modified versions (from some operation happening far below).
+To avoid that you can overload `MultiResolutionIterators.apply(f, ::MyType)`,
+which is the internal map function.
+While there overloading `consolidate` is also likely a good idea.
+
+
+To make `lvls` work to provide **named levels** functionality,
+you need to define some type to be your indexer,
+and overload `MultiResolutionIterators.levelname_map`
+to return a vector of Pairs mapping your index (normally some symbol or a string, but could be anything, baring an Integer) to the integer that is the level number.
 
 ## Usage
 
@@ -54,32 +75,32 @@ julia> using MultiResolutionIterators
 julia> animal_info = [
            [["Turtles", "are", "reptiles", "."],
             ["They", "have", "shells", "."],
-            ["They", "live", "in", "the", "water"]],
+            ["They", "live", "in", "the", "water", "."]],
            [["Cats", "are", "mammals", "."],
-            ["They", "live", "on", "the", "internet"]]
+            ["They", "live", "on", "the", "internet", "."]]
            ]
 2-element Array{Array{Array{String,1},1},1}:
- Array{String,1}[String["Turtles", "are", "reptiles", "."], String["They", "have", "shells", "."], String["They", "live", "in", "the", "water"]]
- Array{String,1}[String["Cats", "are", "mammals", "."], String["They", "live", "on", "the", "internet"]]
+ Array{String,1}[String["Turtles", "are", "reptiles", "."], String["They", "have", "shells", "."], String["They", "live", "in", "the", "water", "."]]
+ Array{String,1}[String["Cats", "are", "mammals", "."], String["They", "live", "on", "the", "internet", "."]]
 
 julia> # Get rid of document boundaries
-       merge_levels(animal_info, 1) |> full_collect
+       merge_levels(animal_info, 1) |> full_consolidate
 5-element Array{Array{String,1},1}:
  String["Turtles", "are", "reptiles", "."]
  String["They", "have", "shells", "."]
- String["They", "live", "in", "the", "water"]
+ String["They", "live", "in", "the", "water", "."]
  String["Cats", "are", "mammals", "."]
- String["They", "live", "on", "the", "internet"]
+ String["They", "live", "on", "the", "internet", "."]
 
 julia> # Get rid of sentence boundaries, so documents made up of words
-       merge_levels(animal_info, 2) |> full_collect
+       merge_levels(animal_info, 2) |> full_consolidate
 2-element Array{Array{String,1},1}:
- String["Turtles", "are", "reptiles", ".", "They", "have", "shells", ".", "They", "live", "in", "the", "water"]
- String["Cats", "are", "mammals", ".", "They", "live", "on", "the", "internet"]
+ String["Turtles", "are", "reptiles", ".", "They", "have", "shells", ".", "They", "live", "in", "the", "water", "."]
+ String["Cats", "are", "mammals", ".", "They", "live", "on", "the", "internet", "."]
 
-julia> # Get rid of document and sentence boundaries
-       merge_levels(animal_info, 1:2) |> full_collect
-22-element Array{String,1}:
+julia> # Get rid of document and sentence boundries
+       merge_levels(animal_info, 1:2) |> full_consolidate
+24-element Array{String,1}:
  "Turtles"
  "are"
  "reptiles"
@@ -87,47 +108,42 @@ julia> # Get rid of document and sentence boundaries
  "They"
  "have"
  "shells"
- ⋮
+ "."
+ "They"
+ "live"
+ "in"
+ "the"
+ "water"
+ "."
+ "Cats"
+ "are"
+ "mammals"
  "."
  "They"
  "live"
  "on"
  "the"
  "internet"
+ "."
 
 julia> # Get rid of all boundaries, just a stream of characters
-       merge_levels(animal_info, ALL_LEVELS) |> full_collect
-88-element Array{Char,1}:
- 'T'
- 'u'
- 'r'
- 't'
- 'l'
- 'e'
- 's'
- ⋮
- 't'
- 'e'
- 'r'
- 'n'
- 'e'
- 't'
+       merge_levels(animal_info, ALL_LEVELS) |> full_consolidate
+"Turtlesarereptiles.Theyhaveshells.Theyliveinthewater.Catsaremammals.Theyliveontheinternet."
 
 julia> # Get rid of word boundaries so each document is a a stream of characters
-       merge_levels(animal_info, [1,3]) |> full_collect
-5-element Array{Array{Char,1},1}:
- ['T', 'u', 'r', 't', 'l', 'e', 's', 'a', 'r', 'e', 'r', 'e', 'p', 't', 'i', 'l', 'e', 's', '.']
- ['T', 'h', 'e', 'y', 'h', 'a', 'v', 'e', 's', 'h', 'e', 'l', 'l', 's', '.']
- ['T', 'h', 'e', 'y', 'l', 'i', 'v', 'e', 'i', 'n', 't', 'h', 'e', 'w', 'a', 't', 'e', 'r']
- ['C', 'a', 't', 's', 'a', 'r', 'e', 'm', 'a', 'm', 'm', 'e', 'l', 's', '.']
- ['T', 'h', 'e', 'y', 'l', 'i', 'v', 'e', 'o', 'n'  …  'h', 'e', 'i', 'n', 't', 'e', 'r', 'n', 'e', 't']
+       merge_levels(animal_info, [1,3]) |> full_consolidate
+5-element Array{String,1}:
+ "Turtlesarereptiles."
+ "Theyhaveshells."
+ "Theyliveinthewater."
+ "Catsaremammals."
+ "Theyliveontheinternet."
 
 julia> # Join all words using spaces, keep other structure
-        join_levels(animal_info, Dict(3=>" ")) |> full_collect
+       join_levels(animal_info, Dict(3=>" ")) |> full_consolidate
 2-element Array{Array{String,1},1}:
- String["Turtles are reptiles .", "They have shells .", "They live in the water"]
- String["Cats are mammals .", "They live on the internet"]
-
+ String["Turtles are reptiles .", "They have shells .", "They live in the water ."]
+ String["Cats are mammals .", "They live on the internet ."]
 ```
 
 
@@ -154,14 +170,14 @@ julia> # Overload `levelname_map` this so it knows the name mapping
 julia> indexer = AnimalTextIndexer();
 
 julia> # Merge all sentences
-       merge_levels(animal_info, lvls(indexer, :sentences)) |> full_collect
+       merge_levels(animal_info, lvls(indexer, :sentences)) |> full_consolidate
 2-element Array{Array{String,1},1}:
- String["Turtles", "are", "reptiles", ".", "They", "have", "shells", ".", "They", "live", "in", "the", "water"]
- String["Cats", "are", "mammals", ".", "They", "live", "on", "the", "internet"]
+ String["Turtles", "are", "reptiles", ".", "They", "have", "shells", ".", "They", "live", "in", "the", "water", "."]
+ String["Cats", "are", "mammals", ".", "They", "live", "on", "the", "internet", "."]
 
 julia> # Merge everything **except** words
-       merge_levels(animal_info, (!lvls)(indexer, :words)) |> full_collect
-22-element Array{String,1}:
+       merge_levels(animal_info, (!lvls)(indexer, :words)) |> full_consolidate
+24-element Array{String,1}:
  "Turtles"
  "are"
  "reptiles"
@@ -169,42 +185,45 @@ julia> # Merge everything **except** words
  "They"
  "have"
  "shells"
- ⋮
+ "."
+ "They"
+ "live"
+ "in"
+ "the"
+ "water"
+ "."
+ "Cats"
+ "are"
+ "mammals"
  "."
  "They"
  "live"
  "on"
  "the"
  "internet"
+ "."
 
-julia> # Merge everything **except** words and sentences
-       merge_levels(animal_info, (!lvls)(indexer, :words, :sentences)) |> full_collect
+julia> # Merge everything **except** words and sentences merge_levels(animal_info, (!lvls)(indexer, :words, :sentences)) |> full_consolidate
+
+       # i.e. merge documents
+       merge_levels(animal_info, lvls(indexer, :documents)) |> full_consolidate
 5-element Array{Array{String,1},1}:
  String["Turtles", "are", "reptiles", "."]
  String["They", "have", "shells", "."]
- String["They", "live", "in", "the", "water"]
+ String["They", "live", "in", "the", "water", "."]
  String["Cats", "are", "mammals", "."]
- String["They", "live", "on", "the", "internet"]
+ String["They", "live", "on", "the", "internet", "."]
 
-julia> # i.e. merge documents
-       merge_levels(animal_info, lvls(indexer, :documents)) |> full_collect
-5-element Array{Array{String,1},1}:
- String["Turtles", "are", "reptiles", "."]
- String["They", "have", "shells", "."]
- String["They", "live", "in", "the", "water"]
- String["Cats", "are", "mammals", "."]
- String["They", "live", "on", "the", "internet"]
-
-
-julia> # Join all words using spaces, join all sentences with new lines, all documents with double new lines
-       join_levels(animal_info, lvls(indexer,Dict(:words=>" ", :sentences=>"\n", :documents=>"\n---\n"))) |> full_collect |> print
-
+julia> # # Join all words using spaces, join all sentences with new lines, all documents with double new lines
+       join_levels(animal_info,
+        lvls(indexer,Dict(:words=>" ", :sentences=>"\n", :documents=>"\n---\n"))) |>
+        full_consolidate |> print
 Turtles are reptiles .
 They have shells .
-They live in the water
+They live in the water .
 ---
 Cats are mammals .
-They live on the internet
+They live on the internet .
 ```
 
 ## See also

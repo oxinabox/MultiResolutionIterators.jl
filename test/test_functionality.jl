@@ -9,29 +9,29 @@ using Base.Iterators
 
 
     @testset "join" begin
-        @test full_collect(join_levels(eg, Dict(2=>" "))) ==
-            full_collect(["aaaa bbbb ccc","AAA BB CCC DDDDD","111 222"])
+        @test full_consolidate(join_levels(eg, Dict(2=>" "))) ==
+            full_consolidate(["aaaa bbbb ccc","AAA BB CCC DDDDD","111 222"])
 
-        @test full_collect(join_levels(eg, Dict(1=>"+", 2=>" "))) ==
-            full_collect("aaaa bbbb ccc+AAA BB CCC DDDDD+111 222")
+        @test full_consolidate(join_levels(eg, Dict(1=>"+", 2=>" "))) ==
+            full_consolidate("aaaa bbbb ccc+AAA BB CCC DDDDD+111 222")
     end
 
 
-    @testset "collect" begin
-        @test full_collect(eg) == eg
+    @testset "consolidate" begin
+        @test full_consolidate(eg) == eg
     end
 
     @testset "merge_levels (flatten)" begin
-        @test full_collect(merge_levels(eg, 1)) ==
-            full_collect(["aaaa", "bbbb", "ccc","AAA", "BB", "CCC", "DDDDD", "111","222"]) ==
+        @test full_consolidate(merge_levels(eg, 1)) ==
+            full_consolidate(["aaaa", "bbbb", "ccc","AAA", "BB", "CCC", "DDDDD", "111","222"]) ==
             ["aaaa", "bbbb", "ccc","AAA", "BB", "CCC", "DDDDD", "111","222"]
 
-        @test full_collect(merge_levels(eg, 2)) == collect.(["aaaabbbbccc","AAABBCCCDDDDD","111222"])
+        @test full_consolidate(merge_levels(eg, 2)) == consolidate.(["aaaabbbbccc","AAABBCCCDDDDD","111222"])
 
-        @test full_collect(merge_levels(eg, 1:2)) ==
-            collect(merge_levels(eg, 1:2)) ==
-            full_collect(merge_levels(eg, ALL_LEVELS))
-            collect("aaaabbbbcccAAABBCCCDDDDD111222")
+        @test full_consolidate(merge_levels(eg, 1:2)) ==
+            full_consolidate(merge_levels(eg, 1:2)) ==
+            full_consolidate(merge_levels(eg, ALL_LEVELS))
+            "aaaabbbbcccAAABBCCCDDDDD111222"
 
     end
 end
@@ -49,37 +49,37 @@ end
         [[["Chelonia", "mydas", ",", "commonly", "known", "as", "the", "green", "turtle", ",", "is", "a", "large", "sea", "turtle", "belonging", "to", "the", "family", "Cheloniidae", "."], ["It", "is", "the", "only", "species", "in", "its", "genus", "."], ["It", "is", "one", "of", "the", "seven", "marine", "turtles", ",", "which", "are", "all", "endangered", "."]], [["Although", "it", "might", "have", "some", "green", "on", "its", "carapace", "(", "shell", ")", ",", "the", "green", "turtle", "is", "not", "green", "."], ["It", "gets", "its", "name", "from", "the", "fact", "that", "its", "body", "fat", "is", "green","."], ["It", "can", "grow", "up", "to", "1", "m", "(", "3", "ft", ")", "long", "and", "weigh", "up", "to", "160","kg", "(", "353", "lb", ")", "."], ["They", "are", "an", "endangered", "species", ",", "especially", "in", "Florida", "and", "the", "Pacific", "coast", "of", "Mexico", "."], ["They", "can", "also", "be", "found", "in", "warm", "waters", "around", "the", "world", "and", "are", "found", "along", "the", "coast", "of", "140", "countries", "."]], [["The", "female", "turtle", "lays", "eggs", "in", "nests", "she", "builds", "in", "the", "sand", "on", "the", "beaches", "."], ["She", "uses", "the", "same", "beach", "that", "she", "was", "born", "on", "."], ["During", "the", "nesting", "season", "in", "summer", "she", "can", "make", "up", "to", "five", "nests", "."], ["She", "can", "lay", "as", "many", "as", "135", "eggs", "in", "a", "nest", "."], ["The", "eggs", "take","about", "two", "months", "to", "hatch", "."], ["The", "baby", "turtles", "are", "about", "50", "mm", "(", "2", "in", ")", "in", "length", "."]]]
         ]
 
-    documents = full_collect(merge_levels(multi_tokenized, 0))
+    documents = full_consolidate(merge_levels(multi_tokenized, 0))
     #corpus, doc, para, sent, word, char
     @test length(documents)==3
     @test typeof(documents[1][1][1][1])==String # words
     @test typeof(documents[1][1][1][1][1])==Char
 
-    paras = full_collect(merge_levels(multi_tokenized, 1))
+    paras = full_consolidate(merge_levels(multi_tokenized, 1))
     #corpus, para, sent, word, char
     @test length(paras) == sum(length.(documents))
     @test typeof(paras[1][1][1])==String # words
     @test typeof(paras[1][1][1][1])==Char
 
-    words = full_collect(merge_levels(multi_tokenized, 1:3))
+    words = full_consolidate(merge_levels(multi_tokenized, 1:3))
     #corpus, word, char
     @test typeof(words[1])==String
     @test typeof(words[end])==String
 
-    docs_of_words = full_collect(merge_levels(multi_tokenized, 2:3))
+    docs_of_words = full_consolidate(merge_levels(multi_tokenized, 2:3))
     #corpus, doc, word, char
     @test length(docs_of_words)==3
     @test typeof(docs_of_words[1][1])==String
 
-    @test full_collect(merge_levels(docs_of_words, 1)) ==
-          full_collect(merge_levels(paras, 1:2)) ==
+    @test full_consolidate(merge_levels(docs_of_words, 1)) ==
+          full_consolidate(merge_levels(paras, 1:2)) ==
           words
 
-    chars = full_collect(merge_levels(multi_tokenized, ALL_LEVELS))
+    chars = full_consolidate(merge_levels(multi_tokenized, ALL_LEVELS))
     @test typeof(chars[1]) == Char
 
-    @test full_collect(merge_levels(docs_of_words, ALL_LEVELS)) ==
-          full_collect(merge_levels(paras, ALL_LEVELS)) ==
-          full_collect(merge_levels(words, ALL_LEVELS)) ==
+    @test full_consolidate(merge_levels(docs_of_words, ALL_LEVELS)) ==
+          full_consolidate(merge_levels(paras, ALL_LEVELS)) ==
+          full_consolidate(merge_levels(words, ALL_LEVELS)) ==
           chars
 end

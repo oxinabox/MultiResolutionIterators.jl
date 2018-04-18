@@ -48,7 +48,7 @@ function apply_to_interior_levels(ff, iter, lvls, max_depth)
         if cur_level <= max_depth
             # Only expand down if not yet at deepset level we act on
             # (This saves on allocations and time
-            childs = imap(childs) do child
+            childs = apply(childs) do child
                 inner(child, cur_level+1)
             end
         end

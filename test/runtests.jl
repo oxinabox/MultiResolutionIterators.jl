@@ -2,7 +2,7 @@ using MultiResolutionIterators
 using Base.Test
 
 
-names = ["functionality", "namedlevels", "demoscript"]
+names = ["basic_functions", "functionality", "namedlevels", "demoscript"]
 
 @testset "$name" for name in names
     include("test_" * name *".jl")

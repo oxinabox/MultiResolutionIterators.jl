@@ -13,27 +13,28 @@ function merge_levels(iter, lvls)
 end
 
 """
-    collect_levels(iter, levels)
+    consolidate_levels(iter, levels)
 
-Applies `collect` on the given levels.
-To turn those levels from iterators into Vectors.
+Applies `consolidate` on the given levels.
+To turn those levels from iterators into something indexable.
+`consolidate` is basically `collect` but it doesn't return `Vectors` just something indexable
 
-See also `full_collect`, which is an alias for doing this on all levels.
+See also `full_consolidate`, which is an alias for doing this on all levels.
 """
-function collect_levels(iter, lvls)
-    apply_at_level(collect, iter, lvls)
+function consolidate_levels(iter, lvls)
+    apply_at_level(consolidate, iter, lvls)
 end
 
 
 
 """
-    full_collect(iter)
+    full_consolidate(iter)
 
 Collect all iterators in the structor,
 converting an Iterator of Iterators of ...
 into a Vector of Vectors of ...
 """
-full_collect(iter) =collect_levels(iter, ALL_LEVELS)
+full_consolidate(iter) =consolidate_levels(iter, ALL_LEVELS)
 
 
 """
