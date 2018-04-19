@@ -1,4 +1,5 @@
 # MultiResolutionIterators
+[![Build status](https://ci.appveyor.com/api/projects/status/truta8xkt9e2k5mi/branch/master?svg=true)](https://ci.appveyor.com/project/oxinabox/multiresolutioniterators-jl/branch/master)
 
 There are many different ways to look at text corpora.
 The true structure of a corpus might be:
