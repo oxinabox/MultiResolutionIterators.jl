@@ -5,14 +5,12 @@ struct Document{T}
     content::T
 end
 
+
 Base.start(doc::Document)=Base.start(doc.content)
 Base.next(doc::Document, state)=Base.next(doc.content, state)
 Base.done(doc::Document, state)=Base.done(doc.content, state)
 
-
-function MultiResolutionIterators.consolidate(aiter::Document)
-    Document(consolidate(aiter.content))
-end
+Base.length(doc::Document)=Base.length(doc.content)
 
 function MultiResolutionIterators.apply(ff, aiter::Document)
     Document(MultiResolutionIterators.apply(ff, aiter.content))
@@ -39,10 +37,11 @@ MultiResolutionIterators.levelname_map(::AnimalTextIndexer) = [
 indexer = AnimalTextIndexer();
 
 # Merge all sentences
-@test merge_levels(animal_info, lvls(indexer, :sentences))|>full_consolidate isa Vector{Document}
-@test full_consolidate(merge_levels(animal_info, lvls(indexer, :sentences))) isa
-    Vector{Document{Vector{Vector{String}}}}
+docs_of_words1 =  full_consolidate(merge_levels(animal_info, lvls(indexer, :sentences)))
+@test typeof(docs_of_words1) == Vector{Document{Vector{String}}}
 
 # I.e keep documents, and words
-@test full_consolidate(merge_levels(animal_info, (!lvls)(indexer, :words, :documents))) isa
-    Vector{Document{Vector{Vector{String}}}}
+docs_of_words2 = full_consolidate(merge_levels(animal_info, (!lvls)(indexer, :words, :documents)))
+@test typeof(docs_of_words2) == Vector{Document{Vector{String}}}
+@test collect(docs_of_words2[1]) == collect(docs_of_words1[1])
+@test collect(docs_of_words2[2]) == collect(docs_of_words1[2])

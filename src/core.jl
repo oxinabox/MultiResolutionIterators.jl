@@ -1,4 +1,3 @@
-
 abstract type Scalarness end
 struct Scalar <: Scalarness end
 struct NotScalar <: Scalarness end
@@ -44,12 +43,14 @@ function apply_to_interior_levels(ff, iter, lvls, max_depth)
 
     # not scalar, children not scalar (probably)
     function inner(::NotScalar, ::NotScalar, childs, cur_level)
-        #TODO Workout why this needs to be <=, and not just <
         if cur_level <= max_depth
             # Only expand down if not yet at deepset level we act on
             # (This saves on allocations and time
-            childs = apply(childs) do child
-                inner(child, cur_level+1)
+            childs = apply(childs) do _childs 
+                # `apply` needs to be wrapped around all operations, including imap/map
+                imap(_childs) do child
+                    inner(child, cur_level+1)
+                end
             end
         end
 
@@ -69,11 +70,10 @@ function apply_at_level(ff, iter, lvls)
     apply_to_interior_levels(iter, lvls, max_depth) do cur_level, childs
         ret = if cur_level ∈ lvls
             # If on the level where we act, then act
-            ff(childs)
+            apply(ff, childs)
         else
             childs
         end
-        @show (cur_level, typeof(ret))
         ret
     end
 end
@@ -94,7 +94,7 @@ function apply_at_level(iter, lvl_ops::Associative{<:Integer})
     apply_to_interior_levels(iter, lvl_ops, max_depth) do cur_level, childs
         # if level is a key then  do the thing, else no change
         if haskey(lvl_ops, cur_level)
-            lvl_ops[cur_level](childs)
+            apply(lvl_ops[cur_level], childs)
         else
             childs
         end

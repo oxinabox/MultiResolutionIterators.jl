@@ -12,9 +12,3 @@ const xss =  [xss_base; Base.Iterators.flatten.(xss_base)]
     end
 end
 
-@testset "apply" begin
-    f = x->x.*x
-    for xs in xss
-        @test map(f, collect(xs)) == collect(MultiResolutionIterators.apply(f, xs))
-    end
-end

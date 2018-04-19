@@ -50,7 +50,6 @@ MultiResolutionIterators will by default destroy all types at all levels it touc
 because it needs to replace their iterators with new modified versions (from some operation happening far below).
 To avoid that you can overload `MultiResolutionIterators.apply(f, ::MyType)`,
 which is the internal map function.
-While there overloading `consolidate` is also likely a good idea.
 
 
 To make `lvls` work to provide **named levels** functionality,
