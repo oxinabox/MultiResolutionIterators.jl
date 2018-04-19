@@ -25,9 +25,10 @@ Very few people want to consider it at that level.
 This is a variation on `collect`.
 It only promises the returned result will be indexable,
 not that it will be a `Vector`.
-It is provided to be overloaded.
+`consolidate`ing iterators with an `eltype` of `Char`, will give you Strings, which for most of our uses is better than `Vector{Char}`.
+it also uses the overloadable `apply`, (see [Customizing Behavour](##customizing-behavour)).
 
-### `consolidate_levels`
+### `consolidate_levels` & `full_consolidate`
 This converts the given levels from iterators to `Vector`s.
 The most useful is likely `consolidate(iter, ALL_LEVELS)` which we export under the alias `full_consolidate`.
 
@@ -43,8 +44,8 @@ This is the levelled version of flatten.
 
 ### `join_levels`
 This is a generalization of `join(strings, delim)`
-Pass in a dictionary from levels to the character to be used to join that level.
-
+Pass in a dictionary from levels to the character/string to be used to join that level.
+e.g. `join_levels(animal_info, Dict(2=>"\n", 3=>" "))`
 
 ## Customizing Behavior
 MultiResolutionIterators will by default destroy all types at all levels it touches,
