@@ -5,12 +5,17 @@ struct Document{T}
     content::T
 end
 
+Base.start(doc::Document)=Base.start(doc.content)
+Base.next(doc::Document, state)=Base.next(doc.content, state)
+Base.done(doc::Document, state)=Base.done(doc.content, state)
+
+
 function MultiResolutionIterators.consolidate(aiter::Document)
     Document(consolidate(aiter.content))
 end
 
 function MultiResolutionIterators.apply(ff, aiter::Document)
-    Document(apply(ff, aiter.content))
+    Document(MultiResolutionIterators.apply(ff, aiter.content))
 end
 
 animal_info = [
@@ -34,7 +39,7 @@ MultiResolutionIterators.levelname_map(::AnimalTextIndexer) = [
 indexer = AnimalTextIndexer();
 
 # Merge all sentences
-@test merge_levels(animal_info, lvls(indexer, :sentences)) isa Vector{<:Document}
+@test merge_levels(animal_info, lvls(indexer, :sentences))|>full_consolidate isa Vector{Document}
 @test full_consolidate(merge_levels(animal_info, lvls(indexer, :sentences))) isa
     Vector{Document{Vector{Vector{String}}}}
 
