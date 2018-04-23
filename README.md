@@ -48,12 +48,14 @@ Pass in a dictionary from levels to the character/string to be used to join that
 e.g. `join_levels(animal_info, Dict(2=>"\n", 3=>" "))`
 
 ## Customizing Behavior
+### Controlling return type of applying functions to levels/elements by overloading `apply`
 MultiResolutionIterators will by default destroy all types at all levels it touches,
 because it needs to replace their iterators with new modified versions (from some operation happening far below).
-To avoid that you can overload `MultiResolutionIterators.apply(f, ::MyType)`,
-which is the internal map function.
+To avoid that you can overload `MultiResolutionIterators.apply(f, xs::MyType)`,
+which is the internal function that is used to apply `f` to `xs` -- it defaults to `f(xs)`.
+You could overload it to `MultiResolutionIterators.apply(f, xs::MyType) = MyType(f(xs)` for example.
 
-
+### Make named levels functionality work by defining a `levelname_map` for an Indexer.
 To make `lvls` work to provide **named levels** functionality,
 you need to define some type to be your indexer,
 and overload `MultiResolutionIterators.levelname_map`
@@ -230,3 +232,4 @@ They live on the internet .
 ## See also
 
  - [AbstractTrees.jl](https://github.com/Keno/AbstractTrees.jl): An iterator of iterators of ... etc duck-types as an `AbstractTree` and will work with AbstractTrees.jl
+ - [MultiScaleArrays.jl](https://github.com/JuliaDiffEq/MultiScaleArrays.jl): A loosely similar idea to this, but focused on `AbstractArrays`.
