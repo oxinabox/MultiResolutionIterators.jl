@@ -1,14 +1,14 @@
 
 """
-    merge_levels(iter, lvls)
+    flatten_levels(iter, lvls)
 
 Flatten, or merge levels.
 
-`merge_levels(iter, 1)` coresponds to `Base.Iterators.flatten(iter)`
+`flatten_levels(iter, 1)` coresponds to `Base.Iterators.flatten(iter)`
 
 
 """
-function merge_levels(iter, lvls)
+function flatten_levels(iter, lvls)
     apply_at_level(Base.Iterators.flatten, iter, lvls)
 end
 

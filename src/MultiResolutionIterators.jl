@@ -1,7 +1,7 @@
 module MultiResolutionIterators
 using IterTools: imap
 export ALL_LEVELS, lvls,
-    merge_levels, join_levels,
+    flatten_levels, join_levels,
     consolidate_levels, full_consolidate, consolidate
 
 

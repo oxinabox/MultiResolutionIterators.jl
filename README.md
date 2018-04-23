@@ -33,7 +33,7 @@ This converts the given levels from iterators to `Vector`s.
 The most useful is likely `consolidate(iter, ALL_LEVELS)` which we export under the alias `full_consolidate`.
 
 
-### `merge_levels`
+### `flatten_levels`
 
 This is the levelled version of flatten.
 `merge(iter, 1)` is the same as `Base.Iterators.flatten(iter)`.
@@ -85,7 +85,7 @@ julia> animal_info = [
  Array{String,1}[String["Cats", "are", "mammals", "."], String["They", "live", "on", "the", "internet", "."]]
 
 julia> # Get rid of document boundaries
-       merge_levels(animal_info, 1) |> full_consolidate
+       flatten_levels(animal_info, 1) |> full_consolidate
 5-element Array{Array{String,1},1}:
  String["Turtles", "are", "reptiles", "."]
  String["They", "have", "shells", "."]
@@ -94,13 +94,13 @@ julia> # Get rid of document boundaries
  String["They", "live", "on", "the", "internet", "."]
 
 julia> # Get rid of sentence boundaries, so documents made up of words
-       merge_levels(animal_info, 2) |> full_consolidate
+       flatten_levels(animal_info, 2) |> full_consolidate
 2-element Array{Array{String,1},1}:
  String["Turtles", "are", "reptiles", ".", "They", "have", "shells", ".", "They", "live", "in", "the", "water", "."]
  String["Cats", "are", "mammals", ".", "They", "live", "on", "the", "internet", "."]
 
 julia> # Get rid of document and sentence boundries
-       merge_levels(animal_info, 1:2) |> full_consolidate
+       flatten_levels(animal_info, 1:2) |> full_consolidate
 24-element Array{String,1}:
  "Turtles"
  "are"
@@ -128,11 +128,11 @@ julia> # Get rid of document and sentence boundries
  "."
 
 julia> # Get rid of all boundaries, just a stream of characters
-       merge_levels(animal_info, ALL_LEVELS) |> full_consolidate
+       flatten_levels(animal_info, ALL_LEVELS) |> full_consolidate
 "Turtlesarereptiles.Theyhaveshells.Theyliveinthewater.Catsaremammals.Theyliveontheinternet."
 
 julia> # Get rid of word boundaries so each document is a a stream of characters
-       merge_levels(animal_info, [1,3]) |> full_consolidate
+       flatten_levels(animal_info, [1,3]) |> full_consolidate
 5-element Array{String,1}:
  "Turtlesarereptiles."
  "Theyhaveshells."
@@ -171,13 +171,13 @@ julia> # Overload `levelname_map` this so it knows the name mapping
 julia> indexer = AnimalTextIndexer();
 
 julia> # Merge all sentences
-       merge_levels(animal_info, lvls(indexer, :sentences)) |> full_consolidate
+       flatten_levels(animal_info, lvls(indexer, :sentences)) |> full_consolidate
 2-element Array{Array{String,1},1}:
  String["Turtles", "are", "reptiles", ".", "They", "have", "shells", ".", "They", "live", "in", "the", "water", "."]
  String["Cats", "are", "mammals", ".", "They", "live", "on", "the", "internet", "."]
 
 julia> # Merge everything **except** words
-       merge_levels(animal_info, (!lvls)(indexer, :words)) |> full_consolidate
+       flatten_levels(animal_info, (!lvls)(indexer, :words)) |> full_consolidate
 24-element Array{String,1}:
  "Turtles"
  "are"
@@ -204,10 +204,10 @@ julia> # Merge everything **except** words
  "internet"
  "."
 
-julia> # Merge everything **except** words and sentences merge_levels(animal_info, (!lvls)(indexer, :words, :sentences)) |> full_consolidate
+julia> # Merge everything **except** words and sentences flatten_levels(animal_info, (!lvls)(indexer, :words, :sentences)) |> full_consolidate
 
        # i.e. merge documents
-       merge_levels(animal_info, lvls(indexer, :documents)) |> full_consolidate
+       flatten_levels(animal_info, lvls(indexer, :documents)) |> full_consolidate
 5-element Array{Array{String,1},1}:
  String["Turtles", "are", "reptiles", "."]
  String["They", "have", "shells", "."]

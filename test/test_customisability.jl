@@ -37,11 +37,11 @@ MultiResolutionIterators.levelname_map(::AnimalTextIndexer) = [
 indexer = AnimalTextIndexer();
 
 # Merge all sentences
-docs_of_words1 =  full_consolidate(merge_levels(animal_info, lvls(indexer, :sentences)))
+docs_of_words1 =  full_consolidate(flatten_levels(animal_info, lvls(indexer, :sentences)))
 @test typeof(docs_of_words1) == Vector{Document{Vector{String}}}
 
 # I.e keep documents, and words
-docs_of_words2 = full_consolidate(merge_levels(animal_info, (!lvls)(indexer, :words, :documents)))
+docs_of_words2 = full_consolidate(flatten_levels(animal_info, (!lvls)(indexer, :words, :documents)))
 @test typeof(docs_of_words2) == Vector{Document{Vector{String}}}
 @test collect(docs_of_words2[1]) == collect(docs_of_words1[1])
 @test collect(docs_of_words2[2]) == collect(docs_of_words1[2])

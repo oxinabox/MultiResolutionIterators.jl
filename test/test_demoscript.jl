@@ -9,19 +9,19 @@ animal_info = [
     ]
 
 # Get rid of document boundaries
-merge_levels(animal_info, 1) |> full_consolidate
+flatten_levels(animal_info, 1) |> full_consolidate
 
 # Get rid of sentence boundaries, so documents made up of words
-merge_levels(animal_info, 2) |> full_consolidate
+flatten_levels(animal_info, 2) |> full_consolidate
 
 # Get rid of document and sentence boundries
-merge_levels(animal_info, 1:2) |> full_consolidate
+flatten_levels(animal_info, 1:2) |> full_consolidate
 
 # Get rid of all boundaries, just a stream of characters
-merge_levels(animal_info, ALL_LEVELS) |> full_consolidate
+flatten_levels(animal_info, ALL_LEVELS) |> full_consolidate
 
 # Get rid of word boundaries so each document is a a stream of characters
-merge_levels(animal_info, [1,3]) |> full_consolidate
+flatten_levels(animal_info, [1,3]) |> full_consolidate
 
 # Join all words using spaces, keep other structure
 join_levels(animal_info, Dict(3=>" ")) |> full_consolidate
@@ -42,20 +42,20 @@ MultiResolutionIterators.levelname_map(::AnimalTextIndexer) = [
 indexer = AnimalTextIndexer();
 
 # Merge all sentences
-merge_levels(animal_info, lvls(indexer, :sentences)) |> full_consolidate
+flatten_levels(animal_info, lvls(indexer, :sentences)) |> full_consolidate
 
 # I.e keep documents, and words
-merge_levels(animal_info, (!lvls)(indexer, :words, :documents)) |> full_consolidate
+flatten_levels(animal_info, (!lvls)(indexer, :words, :documents)) |> full_consolidate
 
 
 # Merge everything **except** words
-merge_levels(animal_info, (!lvls)(indexer, :words)) |> full_consolidate
+flatten_levels(animal_info, (!lvls)(indexer, :words)) |> full_consolidate
 
 # Merge everything **except** words and sentences
-merge_levels(animal_info, (!lvls)(indexer, :words, :sentences)) |> full_consolidate
+flatten_levels(animal_info, (!lvls)(indexer, :words, :sentences)) |> full_consolidate
 
 # i.e. merge documents
-merge_levels(animal_info, lvls(indexer, :documents)) |> full_consolidate
+flatten_levels(animal_info, lvls(indexer, :documents)) |> full_consolidate
 
 
 
