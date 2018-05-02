@@ -17,8 +17,6 @@ apply(f, xs) = f(xs)
 
 
 
-
-
 """
     consolidate(xs)
 
@@ -53,7 +51,7 @@ consolidate(xs::Tuple) = xs
 
 
 function consolidate(xs::T) where T
-    ret =  collect(xs)
+    ret =  apply(collect, xs)
     if eltype(T)==Char || eltype(typeof(ret))==Char # In theory `collect` is type stable
          return String(ret) # A string is no worse (and normally better) than an array of Chars
     end

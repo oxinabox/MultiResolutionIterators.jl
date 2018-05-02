@@ -24,6 +24,7 @@ animal_info = [
      ["They", "live", "on", "the", "internet", "."]])
     ]
 
+
 # Declare an indexer.
 struct AnimalTextIndexer end;
 
@@ -36,12 +37,20 @@ MultiResolutionIterators.levelname_map(::AnimalTextIndexer) = [
 ]
 indexer = AnimalTextIndexer();
 
-# Merge all sentences
-docs_of_words1 =  full_consolidate(flatten_levels(animal_info, lvls(indexer, :sentences)))
-@test typeof(docs_of_words1) == Vector{Document{Vector{String}}}
+@testset "Consolidate" begin
+    @test consolidate(animal_info[1]) |> typeof <: Document
+    @test consolidate_levels(animal_info[1],1) |> typeof <: Document
+    @test full_consolidate(animal_info[1]) |> typeof <: Document
+end
 
-# I.e keep documents, and words
-docs_of_words2 = full_consolidate(flatten_levels(animal_info, (!lvls)(indexer, :words, :documents)))
-@test typeof(docs_of_words2) == Vector{Document{Vector{String}}}
-@test collect(docs_of_words2[1]) == collect(docs_of_words1[1])
-@test collect(docs_of_words2[2]) == collect(docs_of_words1[2])
+@testset "Demo tests" begin
+    # Merge all sentences
+    docs_of_words1 =  full_consolidate(flatten_levels(animal_info, lvls(indexer, :sentences)))
+    @test typeof(docs_of_words1) == Vector{Document{Vector{String}}}
+
+    # I.e keep documents, and words
+    docs_of_words2 = full_consolidate(flatten_levels(animal_info, (!lvls)(indexer, :words, :documents)))
+    @test typeof(docs_of_words2) == Vector{Document{Vector{String}}}
+    @test collect(docs_of_words2[1]) == collect(docs_of_words1[1])
+    @test collect(docs_of_words2[2]) == collect(docs_of_words1[2])
+end
