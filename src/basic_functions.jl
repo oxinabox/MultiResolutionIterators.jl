@@ -1,8 +1,10 @@
 """
     apply(f, xs)
 
-
-You can overload this to manage behvour
+Anytime MultiResolutionIterators.jl would call a function on an element of an iterator (which may be an iterator itself),
+e.g. `flatten` in `flatten_levels`,
+rather than calling it directly as `f(x)` it instead calls `apply(f, x)`.
+This defaults to just calling `f(x)`, but you can overload this to manage behavour.
 ```julia
 struct MyType # Bad type but what ever
     content
