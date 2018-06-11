@@ -26,7 +26,7 @@ This is a variation on `collect`.
 It only promises the returned result will be indexable,
 not that it will be a `Vector`.
 `consolidate`ing iterators with an `eltype` of `Char`, will give you Strings, which for most of our uses is better than `Vector{Char}`.
-it also uses the overloadable `apply`, (see [Customizing Behavour](##customizing-behavour)).
+Beyond its use for `consolidate_levels` it is also useful as a nonleveled operation as it may be faster than convert, and/or make use of costomized behavour from  overloading `apply`, (see [Customizing Behavour](#customizing-behavour)).
 
 ### `consolidate_levels` & `full_consolidate`
 This converts the given levels from iterators to `Vector`s.
@@ -36,10 +36,10 @@ The most useful is likely `consolidate(iter, ALL_LEVELS)` which we export under 
 ### `flatten_levels`
 
 This is the levelled version of flatten.
-`merge(iter, 1)` is the same as `Base.Iterators.flatten(iter)`.
-`merge(iter, 2)` is the same as `Base.Iterators.flatten.(iter)` (assuming iter is Vector or similar)
-`merge(iter, 1:2)` is the same as `Base.Iterators.flatten(Base.Iterators.flatten.(iter))`
-`merge(iter, ALL_LEVELS)` results in a fully flat output.
+`flatten_levels(iter, 1)` is the same as `Base.Iterators.flatten(iter)`.
+`flatten_levels(iter, 2)` is the same as `Base.Iterators.flatten.(iter)` (assuming iter is Vector or similar)
+`flatten_levels(iter, 1:2)` is the same as `Base.Iterators.flatten(Base.Iterators.flatten.(iter))`
+`flatten_levels(iter, ALL_LEVELS)` results in a fully flat output.
 
 
 ### `join_levels`
