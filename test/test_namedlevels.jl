@@ -1,5 +1,5 @@
 using MultiResolutionIterators
-using Base.Test
+using Test
 
 
 struct OneToOneIndexer end

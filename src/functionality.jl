@@ -49,6 +49,6 @@ This is find if they are already strings, or characters, or numbers etc.
 But if they are not, e.g. they were nonmerged layers then this often going to be unusual output.
 But what exactly did you expect it to do? (Answer? Throw an error)
 """
-function join_levels(iter, lvl_delims::Associative)
+function join_levels(iter, lvl_delims::AbstractDict)
     apply_at_level(iter, Dict(lvl => (xs->join(xs,delim))  for (lvl,delim) in lvl_delims))
 end

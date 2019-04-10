@@ -1,5 +1,6 @@
+using Random
 
-srand(1)
+Random.seed!(1)
 len=15
 xss_base = [randstring(len), rand(1:100, len), [randstring(rand(1:10)) for ii=1:len]]
 const xss =  [xss_base; Base.Iterators.flatten.(xss_base)]
@@ -11,4 +12,3 @@ const xss =  [xss_base; Base.Iterators.flatten.(xss_base)]
         end
     end
 end
-

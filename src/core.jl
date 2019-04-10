@@ -6,7 +6,7 @@ isscalar(::Type{Any}) = NotScalar() # if we don't know the type we can't really 
 isscalar(::Type{<:AbstractString}) = NotScalar() # We consider strings to be nonscalar
 isscalar(::Type{<:Number}) = Scalar() # We consider Numbers to be scalar
 isscalar(::Type{Char}) = Scalar() # We consider Sharacter to be scalar
-isscalar(::Type{T}) where T = method_exists(start, (T,)) ? NotScalar() : Scalar()
+isscalar(::Type{T}) where T = hasmethod(iterate, (T,)) ? NotScalar() : Scalar()
 
 
 
@@ -46,7 +46,7 @@ function apply_to_interior_levels(ff, iter, lvls, max_depth)
         if cur_level <= max_depth
             # Only expand down if not yet at deepset level we act on
             # (This saves on allocations and time
-            childs = apply(childs) do _childs 
+            childs = apply(childs) do _childs
                 # `apply` needs to be wrapped around all operations, including imap/map
                 imap(_childs) do child
                     inner(child, cur_level+1)
@@ -89,7 +89,7 @@ Applies a op
 If only a single level and a single op is provider,
 then this is identical to `apply_at_level`.
 """
-function apply_at_level(iter, lvl_ops::Associative{<:Integer})
+function apply_at_level(iter, lvl_ops::AbstractDict{<:Integer})
     max_depth = maximum(keys(lvl_ops))
     apply_to_interior_levels(iter, lvl_ops, max_depth) do cur_level, childs
         # if level is a key then  do the thing, else no change
