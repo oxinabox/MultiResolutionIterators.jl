@@ -23,7 +23,7 @@ function lvls(indexer, names::Vararg{Symbol})
     name_set = first.(levelname_map(indexer))
     num_set = last.(levelname_map(indexer))
     map(names) do name
-        ind = something(findfirst(isequal(name), name_set), 0)
+        ind = findfirst(isequal(name), name_set)
         num_set[ind]
     end
 end
