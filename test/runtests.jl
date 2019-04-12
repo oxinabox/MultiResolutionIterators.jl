@@ -1,5 +1,5 @@
 using MultiResolutionIterators
-using Base.Test
+using Test
 
 
 names = ["basic_functions", "functionality", "namedlevels", "demoscript", "customisability"]

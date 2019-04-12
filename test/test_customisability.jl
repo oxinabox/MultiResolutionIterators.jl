@@ -1,14 +1,12 @@
-using Base.Test
 using MultiResolutionIterators
+using Test
 
 struct Document{T}
     content::T
 end
 
-
-Base.start(doc::Document)=Base.start(doc.content)
-Base.next(doc::Document, state)=Base.next(doc.content, state)
-Base.done(doc::Document, state)=Base.done(doc.content, state)
+Base.iterate(doc::Document)=iterate(doc.content)
+Base.iterate(doc::Document, state)=iterate(doc.content, state)
 
 Base.length(doc::Document)=Base.length(doc.content)
 

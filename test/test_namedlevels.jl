@@ -1,5 +1,5 @@
 using MultiResolutionIterators
-using Base.Test
+using Test
 
 
 struct OneToOneIndexer end
@@ -58,7 +58,7 @@ end
 @testset "ManyToOneIndexer overlap" begin
     indexer = ManyToOneIndexer()
     @testset "lvls" begin
-        @test_throws BoundsError lvls(indexer, :fish)
+        @test_throws ArgumentError lvls(indexer, :fish)
 
         @test lvls(indexer)|>Set == Set()
         @test lvls(indexer, :para)|>Set ==

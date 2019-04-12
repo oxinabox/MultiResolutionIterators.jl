@@ -1,12 +1,10 @@
 using MultiResolutionIterators
-using Base.Test
+using Test
 using Base.Iterators
 
 
 @testset "basic 1" begin
     eg =   [["aaaa", "bbbb", "ccc"], ["AAA", "BB", "CCC", "DDDDD"], ["111","222"]]
-
-
 
     @testset "join" begin
         @test full_consolidate(join_levels(eg, Dict(2=>" "))) ==
@@ -15,7 +13,6 @@ using Base.Iterators
         @test full_consolidate(join_levels(eg, Dict(1=>"+", 2=>" "))) ==
             full_consolidate("aaaa bbbb ccc+AAA BB CCC DDDDD+111 222")
     end
-
 
     @testset "consolidate" begin
         @test full_consolidate(eg) == eg
