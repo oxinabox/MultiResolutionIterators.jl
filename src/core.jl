@@ -5,7 +5,7 @@ struct NotScalar <: Scalarness end
 isscalar(::Type{Any}) = NotScalar() # if we don't know the type we can't really know if scalar or not
 isscalar(::Type{<:AbstractString}) = NotScalar() # We consider strings to be nonscalar
 isscalar(::Type{<:Number}) = Scalar() # We consider Numbers to be scalar
-isscalar(::Type{Char}) = Scalar() # We consider Sharacter to be scalar
+isscalar(::Type{Char}) = Scalar() # We consider Character to be scalar
 isscalar(::Type{T}) where T = hasmethod(iterate, (T,)) ? NotScalar() : Scalar()
 
 
