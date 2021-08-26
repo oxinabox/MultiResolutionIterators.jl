@@ -30,7 +30,7 @@ Beyond its use for `consolidate_levels` it is also useful as a nonleveled operat
 
 ### `consolidate_levels` & `full_consolidate`
 This converts the given levels from iterators to `Vector`s.
-The most useful is likely `consolidate(iter, ALL_LEVELS)` which we export under the alias `full_consolidate`.
+The most useful is likely `consolidate_levels(iter, ALL_LEVELS)` which we export under the alias `full_consolidate`.
 
 
 ### `flatten_levels`
