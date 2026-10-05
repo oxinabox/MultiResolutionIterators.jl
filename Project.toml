@@ -1,6 +1,6 @@
 name = "MultiResolutionIterators"
 uuid = "396aa475-d5af-5b65-8c11-5c82e21b2380"
-version = "0.5.0"
+version = "0.5.1"
 
 [deps]
 IterTools = "c8e1da08-722c-5040-9ed9-7db0dc04731e"
